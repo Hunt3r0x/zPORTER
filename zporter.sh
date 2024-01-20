@@ -4,12 +4,15 @@ output_file=""
 
 port_scan() {
     local host=$1
+    local cmd
 
-    if [ -z "$output_file" ]; then
-        seq 1 65535 | xargs -P 200 -I {} httpx -silent -sc -cl -title -u "${host}:{}"
-    else
-        seq 1 65535 | xargs -P 200 -I {} httpx -silent -sc -cl -title -o "$output_file" -u "${host}:{}"
+    cmd="seq 1 65535 | xargs -P 200 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
+
+    if [ -n "$output_file" ]; then
+        cmd+=" -o $output_file"
     fi
+
+    eval "$cmd"
 }
 
 extract_domain() {
