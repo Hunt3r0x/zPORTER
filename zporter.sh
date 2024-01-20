@@ -9,7 +9,7 @@ port_scan() {
     command="seq 1 65535 | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
 
     if [ -n "$output_file" ]; then
-        command+=" -o $output_file"
+        command+=" | tee -a $output_file"
     fi
 
     eval "$command"
