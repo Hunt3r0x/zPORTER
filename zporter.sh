@@ -1,15 +1,17 @@
 #!/bin/bash
 
 output_file=""
+port_range="1 65535"
 
 port_scan() {
     local host=$1
     local command
 
-    command="seq 1 65535 | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
+    command="seq $port_range | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
 
     if [ -n "$output_file" ]; then
         command+=" | tee -a $output_file"
+        # seq $port_range | xargs -P 100 -I {} httpx -silent -sc -cl -title -u "${host}:{}" | tee -a "$output_file"
     fi
 
     eval "$command"
@@ -25,19 +27,9 @@ while getopts "l:d:o:" opt; do
     case $opt in
     l)
         file="$OPTARG"
-        if [ ! -s "$file" ]; then
-            echo "File $file is missing or empty."
-            exit 1
-        fi
-        while IFS= read -r line; do
-            domain=$(extract_domain "$line")
-            port_scan "$domain"
-        done <"$file"
         ;;
     d)
-        input="$OPTARG"
-        domain=$(extract_domain "$input")
-        port_scan "$domain"
+        single_domain="$OPTARG"
         ;;
     o)
         output_file="$OPTARG"
@@ -49,7 +41,21 @@ while getopts "l:d:o:" opt; do
     esac
 done
 
-if [ $OPTIND -eq 1 ]; then
+if [ -n "$file" ]; then
+    if [ ! -f "$file" ]; then
+        echo "File $file does not exist."
+        exit 1
+    fi
+
+    while IFS= read -r line; do
+        domain=$(extract_domain "$line")
+        port_scan "$domain"
+    done <"$file"
+
+elif [ -n "$single_domain" ]; then
+    domain=$(extract_domain "$single_domain")
+    port_scan "$domain"
+else
     echo "Usage: $0 -l <file> or $0 -d <input> [-o <output_file>]"
     echo "Example: $0 -l list.txt or $0 -d x.com -o out.txt"
     exit 1
