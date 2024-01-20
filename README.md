@@ -37,6 +37,7 @@ To specify an output file for the scan results:
 
 To specify a custom port range:
 
+##### i will add it tomorrow after arch exam
 ```bash
 ./zporter.sh -d example.com -p 1000-2000
 ```
