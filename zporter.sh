@@ -1,17 +1,17 @@
 #!/bin/bash
 
 output_file=""
-port_range="1 65535"
+prange="1 65535"
 
-port_scan() {
+pscan() {
     local host=$1
     local command
 
-    command="seq $port_range | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
+    command="seq $prange | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
 
     if [ -n "$output_file" ]; then
         command+=" | tee -a $output_file"
-        # seq $port_range | xargs -P 100 -I {} httpx -silent -sc -cl -title -u "${host}:{}" | tee -a "$output_file"
+        # seq $prange | xargs -P 100 -I {} httpx -silent -sc -cl -title -u "${host}:{}" | tee -a "$output_file"
     fi
 
     eval "$command"
@@ -49,12 +49,12 @@ if [ -n "$file" ]; then
 
     while IFS= read -r line; do
         domain=$(extract_domain "$line")
-        port_scan "$domain"
+        pscan "$domain"
     done <"$file"
 
 elif [ -n "$single_domain" ]; then
     domain=$(extract_domain "$single_domain")
-    port_scan "$domain"
+    pscan "$domain"
 else
     echo "Usage: $0 -l <file> or $0 -d <input> [-o <output_file>]"
     echo "Example: $0 -l list.txt or $0 -d x.com -o out.txt"
