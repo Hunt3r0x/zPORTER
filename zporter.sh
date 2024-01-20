@@ -4,15 +4,15 @@ output_file=""
 
 port_scan() {
     local host=$1
-    local cmd
+    local command
 
-    cmd="seq 1 65535 | xargs -P 200 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
+    command="seq 1 65535 | xargs -P 200 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
 
     if [ -n "$output_file" ]; then
-        cmd+=" -o $output_file"
+        command+=" -o $output_file"
     fi
 
-    eval "$cmd"
+    eval "$command"
 }
 
 extract_domain() {
@@ -53,5 +53,6 @@ done
 
 if [ $OPTIND -eq 1 ]; then
     echo "Usage: $0 -l <file> or $0 -d <input> [-o <output_file>]"
+    echo "Usage: $0 -l list.txt or $0 -d x.com -o out.txt"
     exit 1
 fi
