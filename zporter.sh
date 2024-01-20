@@ -18,9 +18,7 @@ port_scan() {
 extract_domain() {
     local input=$1
 
-    local domain=$(echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+' | sort -u) # i realy hate this ):
-
-    echo "$domain"
+    echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+' | sort -u # i realy hate this ):
 }
 
 while getopts "l:d:o:" opt; do
@@ -32,13 +30,13 @@ while getopts "l:d:o:" opt; do
             exit 1
         fi
         while IFS= read -r line; do
-            local domain=$(extract_domain "$line")
+            domain=$(extract_domain "$line")
             port_scan "$domain"
         done <"$file"
         ;;
     d)
         input="$OPTARG"
-        local domain=$(extract_domain "$input")
+        domain=$(extract_domain "$input")
         port_scan "$domain"
         ;;
     o)
@@ -53,6 +51,6 @@ done
 
 if [ $OPTIND -eq 1 ]; then
     echo "Usage: $0 -l <file> or $0 -d <input> [-o <output_file>]"
-    echo "Usage: $0 -l list.txt or $0 -d x.com -o out.txt"
+    echo "Example: $0 -l list.txt or $0 -d example.com -o out.txt"
     exit 1
 fi
