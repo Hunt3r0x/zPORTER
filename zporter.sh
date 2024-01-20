@@ -1,6 +1,11 @@
 #!/bin/bash
 
-output_file=""
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+output=""
 prange="1 65535"
 
 # pscan() {
@@ -28,10 +33,10 @@ pscan() {
     fi
 }
 
-extract_domain() {
+filter() {
     local input=$1
 
-    echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+' | sort -u
+    echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+' | sort -u # i realy hate this ):
 }
 
 while getopts "l:d:o:" opt; do
@@ -59,12 +64,12 @@ if [ -n "$file" ]; then
     fi
 
     while IFS= read -r line; do
-        domain=$(extract_domain "$line")
+        domain=$(filter "$line")
         pscan "$domain"
     done <"$file"
 
 elif [ -n "$single_domain" ]; then
-    domain=$(extract_domain "$single_domain")
+    domain=$(filter "$single_domain")
     pscan "$domain"
 else
     echo -e "${GREEN}USAGE:${NC}"
@@ -72,7 +77,6 @@ else
     echo -e "        domains from a file"
     echo -e "    ${YELLOW}./zporter.sh -d <input> [-o <output>]${NC}"
     echo -e "        single domain/IP"
-    echo -e ""
     echo -e "${GREEN}EXAMPLES:${NC}"
     echo -e "    ${YELLOW}./zporter.sh -d x.com -o out.txt${NC}"
     echo -e "    ${YELLOW}./zporter.sh -l list.txt -o out.txt${NC}"
