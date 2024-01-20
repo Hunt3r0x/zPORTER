@@ -18,7 +18,7 @@ port_scan() {
 extract_domain() {
     local input=$1
 
-    local domain=$(echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+') # i realy hate this ):
+    local domain=$(echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+' | sort -u) # i realy hate this ):
 
     echo "$domain"
 }
