@@ -51,6 +51,6 @@ done
 
 if [ $OPTIND -eq 1 ]; then
     echo "Usage: $0 -l <file> or $0 -d <input> [-o <output_file>]"
-    echo "Example: $0 -l list.txt or $0 -d example.com -o out.txt"
+    echo "Example: $0 -l list.txt or $0 -d x.com -o out.txt"
     exit 1
 fi
