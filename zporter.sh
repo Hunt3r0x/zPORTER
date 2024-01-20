@@ -6,7 +6,7 @@ port_scan() {
     local host=$1
     local command
 
-    command="seq 1 65535 | xargs -P 200 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
+    command="seq 1 65535 | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}"
 
     if [ -n "$output_file" ]; then
         command+=" -o $output_file"
