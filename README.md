@@ -42,12 +42,12 @@ To specify a custom port range:
 ```
 
 ## Options
-- `d <domain or IP>     `:       Specify a single domain or IP to scan"
-- `l <list of domains>  `:       Specify a file containing a list of domains to scan"
-- `o <output file>      `:       Specify the output file to save scan results"
+- `d <domain or IP>`:       Specify a single domain or IP to scan"
+- `l <list of domains>`:       Specify a file containing a list of domains to scan"
+- `o <output file>`:       Specify the output file to save scan results"
 - `t <threads>`          :       Specify the number of threads for httpx (default is 50)"
-- `range <start-end>    `:       Specify a port range (e.g., 1-1000)"
-- `h                    `:       Display this help message"
+- `range <start-end>`:       Specify a port range (e.g., 1-1000)"
+- `h`:       Display this help message"
 
 ## Disclaimer
 This tool is for educational and ethical testing purposes only. The user is responsible for ensuring all scans comply with relevant laws and regulations.
