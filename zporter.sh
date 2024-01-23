@@ -9,7 +9,7 @@ NC='\033[0m'
 output=""
 from=1
 to=65535
-threads=50
+threads=100
 
 zporter_tmp_dir="/tmp/zPORTER"
 mkdir -p "$zporter_tmp_dir"
@@ -45,6 +45,7 @@ displayusage() {
 pscan() {
     local host=$1
     local temp_file=$(mktemp "$zporter_tmp_dir/tmp.XXXXXXXX")
+    local httpx_flags="-silent -sc -cl -title -t $threads"
 
     for port in $(seq $from $to); do
         echo "${host}:${port}" >>"$temp_file"
@@ -52,9 +53,9 @@ pscan() {
 
     if [ -n "$output" ]; then
         echo -e "${GREEN} results will be saved --> ${YELLOW}${output}${NC}\n"
-        httpx -l $temp_file -silent -sc -cl -title -t $threads | tee -a "$output"
+        httpx -l $temp_file ${httpx_flags} | tee -a "$output"
     else
-        httpx -l $temp_file -silent -sc -cl -title -t $threads
+        httpx -l $temp_file ${httpx_flags}
     fi
 
     rm -f "$temp_file"
@@ -150,7 +151,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-# if [ -n "$file" ]; then
+if [ -n "$file" ]; then
 #     if [ ! -f "$file" ]; then
 #         echo -e "${YELLOW}File $file does not exist.${NC}"
 #         exit 1
