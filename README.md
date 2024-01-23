@@ -4,7 +4,7 @@
 This script performs a port scan on given IP addresses or domains. It's designed to scan a range of ports and identify open ports using `httpx`.
 
 ## Features
-- Scan a custom range of ports on multiple hosts. <<< i will add it tomorrow after arch exam
+- Scan a custom range of ports on multiple hosts.
 - Option to specify custom port ranges.
 - Output can be directed to a file.
 - Handles both IP addresses and domain names, sanitizing input to extract only the domain or subdomain part.
@@ -37,15 +37,17 @@ To specify an output file for the scan results:
 
 To specify a custom port range:
 
-##### i will add it tomorrow after arch exam
 ```bash
-./zporter.sh -d example.com -p 1000-2000
+./zporter.sh -d example.com -range 1000-5000
 ```
 
 ## Options
-- `-d <domain/IP>`: Specify a single domain or IP for scanning.
-- `-l <file>`: Specify a file containing a list of domains/IPs to scan.
-- `-o <output_file>`: (Optional) Specify an output file for the results.
+- `d <domain or IP>     `:       Specify a single domain or IP to scan"
+- `l <list of domains>  `:       Specify a file containing a list of domains to scan"
+- `o <output file>      `:       Specify the output file to save scan results"
+- `t <threads>`          :       Specify the number of threads for httpx (default is 50)"
+- `range <start-end>    `:       Specify a port range (e.g., 1-1000)"
+- `h                    `:       Display this help message"
 
 ## Disclaimer
 This tool is for educational and ethical testing purposes only. The user is responsible for ensuring all scans comply with relevant laws and regulations.

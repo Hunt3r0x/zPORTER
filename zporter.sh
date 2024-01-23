@@ -7,7 +7,12 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 output=""
-prange="1 65535"
+from=1
+to=65535
+threads=50
+
+zporter_tmp_dir="/tmp/zPORTER"
+mkdir -p "$zporter_tmp_dir"
 
 # pscan() {
 #     local host=$1
@@ -28,27 +33,50 @@ displayusage() {
     echo -e "  -d <domain or IP>            Specify a single domain or IP to scan"
     echo -e "  -l <list of domains>         Specify a file containing a list of domains to scan"
     echo -e "  -o <output file>             Specify the output file to save scan results"
+    echo -e "  -t <number of threads>       Specify the number of threads for httpx (default is 50)"
+    echo -e "  -range <start-end>           Specify a port range (e.g., 1-1000)"
     echo -e "  -h                           Display this help message"
-    echo -e "${CYAN}EXAMPLE:"
-    echo -e "${YELLOW}      ./zporter.sh -d x.com -o out.txt${NC}"
-    echo -e "${YELLOW}      ./zporter.sh -l list.txt -o out.txt${NC}"
+    echo -e "${CYAN}EXAMPLE:${NC}"
+    echo -e "  ${YELLOW}./zporter.sh -d x.com ${NC}"
+    echo -e "  ${YELLOW}./zporter.sh -l list.txt -o out.txt${NC}"
+    echo -e "  ${YELLOW}./zporter.sh -l list.txt -o out.txt -t 100 -range 1-8080${NC}"
 }
 
 pscan() {
     local host=$1
+    local temp_file=$(mktemp "$zporter_tmp_dir/tmp.XXXXXXXX")
+
+    for port in $(seq $from $to); do
+        echo "${host}:${port}" >>"$temp_file"
+    done
 
     if [ -n "$output" ]; then
         echo -e "${GREEN} results will be saved --> ${YELLOW}${output}${NC}\n"
-        seq $prange | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{} | tee -a "$output"
+        httpx -l $temp_file -silent -sc -cl -title -t $threads | tee -a "$output"
     else
-        seq $prange | xargs -P 100 -I {} httpx -silent -sc -cl -title -u ${host}:{}
+        httpx -l $temp_file -silent -sc -cl -title -t $threads
     fi
+
+    rm -f "$temp_file"
 }
+
+# process_domains() {
+#     local domains=$1
+#     IFS=', ' read -ra ADDR <<<"$domains"
+#     for i in "${ADDR[@]}"; do
+#         domain=$(filter "$i")
+#         echo "$domain" >>"$tmpfile"
+#     done
+# }
 
 filter() {
     local input=$1
 
     echo "$input" | grep -oP '^(?:http:\/\/|https:\/\/)?\K[^\/\?:#]+' | sort -u # i realy hate this ):
+}
+
+is_integer() {
+    [[ $1 =~ ^[0-9]+$ ]]
 }
 
 while [[ $# -gt 0 ]]; do
@@ -78,6 +106,28 @@ while [[ $# -gt 0 ]]; do
         fi
         shift
         ;;
+    -range)
+        range_arg="$2"
+        if [[ $range_arg =~ ^[0-9]+-[0-9]+$ ]]; then
+            from=$(echo $range_arg | cut -d '-' -f 1)
+            to=$(echo $range_arg | cut -d '-' -f 2)
+        else
+            echo -e "${RED}INVALID PORT RANGE. USE 'start-end' FORMAT (e.g., 1-1000)${NC}" >&2
+            displayusage
+            exit 1
+        fi
+        shift
+        ;;
+    -t)
+        if is_integer "$2"; then
+            threads="$2"
+        else
+            echo -e "${RED}VALUE MUST BE INT${NC}" >&2
+            displayusage
+            exit 1
+        fi
+        shift
+        ;;
     -h)
         displayusage
         exit 0
@@ -100,11 +150,11 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [ -n "$file" ]; then
-    # if [ ! -f "$file" ]; then
-    #     echo -e "${YELLOW}File $file does not exist.${NC}"
-    #     exit 1
-    # fi
+# if [ -n "$file" ]; then
+#     if [ ! -f "$file" ]; then
+#         echo -e "${YELLOW}File $file does not exist.${NC}"
+#         exit 1
+#     fi
 
     while IFS= read -r line; do
         domain=$(filter "$line")
